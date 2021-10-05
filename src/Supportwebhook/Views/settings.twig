@@ -1,0 +1,70 @@
+<p>{{ trans("supportwebhook.config.variables") }} <strong>{{ variablesNames | join(', ') }}.</strong>
+
+    <button class="btn btn-primary" type="button" onclick="$('#container-add').html($('#container-add').html() + $('#container').html().replaceAll(-1, $('#container').attr('data-i'))); $('#container').attr('data-i', parseInt($('#container').attr('data-i')) + 1);"><i class="fas fa-plus"></i></button>
+
+<div class="form-group custom-control custom-switch">
+    <input type="checkbox" class="custom-control-input" id="support.webhook" name="support.webhook"
+           data-toggle="collapse"
+           data-target="#DiscordGroup" {% if setting('support_webhook') == 'true' %} checked {% endif %}>
+    <label class="custom-control-label" for="support.webhook">{{ trans("enabled") }}</label>
+</div>
+
+<div id="DiscordGroup" class="{{ setting('support_webhook') == 'true' ? 'show' : 'collapse' }}">
+    <div class="card border-primary">
+        <div class="card-body mb-2">
+
+            <div  id="container" class="d-none" data-i="{{ i }}">
+
+            <div class="row">
+                <div class="col-sm-12 col-xl-4 col-md-12">
+
+                    {{ field('support_webhook_url[-1]',null, trans("supportwebhook.config.url")) }}
+                </div>
+                <div class="col-sm-12 col-xl-4 col-md-12">
+                    {% set values = options |  keys | first %}
+                    {{ field('support_webhook_action[-1]',[values], trans("action"), {options: options, arrayFirst: true}) }}
+                </div>
+                <div class="col-sm-12 col-xl-4 col-md-12">
+                    {{ field('support_webhook_message[-1]',null,trans("message"), {type: 'textarea'}) }}
+                    <button class="btn btn-danger" type="button" onclick="$(this).parent().parent().remove();$('#container').attr('data-i', parseInt($('#container').attr('data-i')) - 1);"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            </div>
+            <div id="container-add">
+                {% if webhooks is empty %}
+
+                <div class="row">
+                    <div class="col-sm-12 col-xl-4 col-md-12">
+
+                        {{ field('support_webhook_url[0]',null, trans("supportwebhook.config.url")) }}
+                    </div>
+                    <div class="col-sm-12 col-xl-4 col-md-12">
+                        {% set values = options |  keys | first %}
+                        {{ field('support_webhook_action[0]',values, trans("action"), {options: options, arrayFirst: true}) }}
+                    </div>
+                    <div class="col-sm-12 col-xl-4 col-md-12">
+                        {{ field('support_webhook_message[0]',null,trans("message"), {type: 'textarea'}) }}
+                        <button class="btn btn-danger" type="button" onclick="$(this).parent().parent().remove();$('#container').attr('data-i', parseInt($('#container').attr('data-i')) - 1);"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                {% endif %}
+                 {% for key, config in webhooks %}
+                     <div class="row">
+                        <div class="col-sm-12 col-xl-4 col-md-12">
+
+                            {{ field('support_webhook_url['~ "'" ~ key ~"'" ~']', config['url'], trans("supportwebhook.config.url")) }}
+                        </div>
+                        <div class="col-sm-12 col-xl-4 col-md-12">
+                            {{ field('support_webhook_action['~ "'" ~ key ~"'" ~']', config['action'] , trans("action"), {options: options, arrayFirst: true}) }}
+                        </div>
+                        <div class="col-sm-12 col-xl-4 col-md-12">
+                            {{ field('support_webhook_message['~ "'" ~ key ~"'" ~']', config['message'], trans("message"), {type: 'textarea'}) }}
+                            <button class="btn btn-danger" type="button" onclick="$(this).parent().parent().remove(); $('#container').attr('data-i', parseInt($('#container').attr('data-i')) - 1);"><i class="fas fa-trash"></i></button>
+                        </div>
+                     </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
