@@ -1,7 +1,7 @@
 <?php
 namespace App\Supportwebhook;
 
-use App\SupportWebhook\Event\WebhookManager;
+use App\Supportwebhook\Event\WebhookManager;
 use ClientX\Module;
 use ClientX\Renderer\RendererInterface;
 
