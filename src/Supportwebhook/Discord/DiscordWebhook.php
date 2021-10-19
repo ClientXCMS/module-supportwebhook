@@ -1,7 +1,7 @@
 <?php
 namespace App\Supportwebhook\Discord;
 
-use App\SupportWebhook\WebhookInterface;
+use App\Supportwebhook\WebhookInterface;
 use ClientX\Discord\DiscordMessage;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
