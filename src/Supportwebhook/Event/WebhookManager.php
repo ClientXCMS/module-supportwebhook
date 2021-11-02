@@ -54,7 +54,7 @@ class WebhookManager
 
             foreach ($configs as $config) {
                 if ($event->getName() != $config['action']) {
-                    return;
+                    continue;
                 }
                 if ($config['message'] != null || $config['url'] != null) {
                     $route = $this->router->generateURI('support.admin.ticket.edit', ['id' => $target->getId()]);
