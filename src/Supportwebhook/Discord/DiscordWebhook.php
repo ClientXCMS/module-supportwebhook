@@ -63,6 +63,10 @@ class DiscordWebhook implements WebhookInterface
         if (!$config && $this->config) {
             return $this->config;
         }
+        
+		if ($config ==  null){
+			$config = [];
+		}
         $this->config = $config;
         return $config;
     }
