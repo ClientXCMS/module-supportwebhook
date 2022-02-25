@@ -88,7 +88,12 @@ class WebhookManager
     {
         foreach ($this->webhooks as $webhook) {
             $keyName = "support.webhook.config";
-            $data = json_decode(json_encode(str_replace("'", '', $this->container->get($keyName))), true);
+			if ($this->container->has($keyName)){
+            	$data = json_decode(json_encode(str_replace("'", '', $this->container->get($keyName))), true);
+			} else {
+                $webhook->config([]);
+                return;
+			}
             $data = collect($data)->map('json_decode')->toArray();
 
             $actions = $data['action'] ?? [];
