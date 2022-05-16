@@ -4,6 +4,8 @@ namespace App\Supportwebhook\Event;
 
 use App\ClientX\Cache\LicenseCache;
 use App\Support\Database\DepartmentTable;
+use App\Support\Database\MessageTable;
+use App\Auth\Database\UserTable;
 use App\Support\Entity\Ticket;
 use App\Support\Events\AbstractSupportEvent;
 use App\Supportwebhook\Discord\DiscordWebhook;
@@ -22,13 +24,16 @@ class WebhookManager
     private Router $router;
 
     private DepartmentTable $table;
-
+    private UserTable $user;
+    private MessageTable $message;
     public function __construct(EventManager $event, ContainerInterface $container, array $webhooks = [])
     {
         $this->container = $container;
         $this->webhooks = [new DiscordWebhook()];
         $this->table = $container->get(DepartmentTable::class);
+	$this->message = $container->get(MessageTable::class);
         $this->router = $container->get(Router::class);
+        $this->user = $container->get(UserTable::class);
         $event->attach('support.submit', $this);
         $event->attach('support.close', $this);
         $event->attach('support.replay', $this);
@@ -57,7 +62,10 @@ class WebhookManager
                     continue;
                 }
                 if ($config['message'] != null || $config['url'] != null) {
-                    $route = $this->router->generateURI('support.admin.ticket.edit', ['id' => $target->getId()]);
+		    $message = $this->message->find($target->getId());
+		    $ticketId = $message->getTicketId();
+                    $route = $this->router->generateURI('support.admin.ticket.edit', ['id' => $ticketId]);
+		    $user = $this->user->find($target->userid);
                     $context = [
                         '%subject%' => $target->subject,
                         '%url%' => RequestHelper::fromGlobal() . $route,
@@ -66,6 +74,9 @@ class WebhookManager
                         '%created_at%' => (new \DateTime())->format(\DateTimeInterface::ATOM),
                         '%action%' => ucfirst(explode('.', $event->getName())[1]),
                         '%content%' => $target->getContent(),
+			'%email%' => $user->email,
+			'%userId%' => $user->id,
+			'%username%' => $user->getName(),
                     ];
                     if ($target->getRelated() != null) {
                         $routeName = $target->getRelated()->getRouteName();
@@ -74,8 +85,10 @@ class WebhookManager
                             '%related%' => $target->getRelated()->getName(),
                             '%relatedUrl%' => $this->router->generateURI($routeName, compact('id'))]);
                     } else {
-                        $context = array_merge($context, ['%related%' => '',
-                            '%relatedUrl%' => '']);
+                        $context = array_merge($context, [
+				'%related%' => '',
+                            	'%relatedUrl%' => ''
+			]);
                     }
                     $webhook->context(d($config['message']), $context);
 
@@ -88,12 +101,12 @@ class WebhookManager
     {
         foreach ($this->webhooks as $webhook) {
             $keyName = "support.webhook.config";
-			if ($this->container->has($keyName)){
-            	$data = json_decode(json_encode(str_replace("'", '', $this->container->get($keyName))), true);
-			} else {
-                $webhook->config([]);
-                return;
-			}
+		if ($this->container->has($keyName)){
+            		$data = json_decode(json_encode(str_replace("'", '', $this->container->get($keyName))), true);
+		} else {
+			$webhook->config([]);
+			return;
+		}
             $data = collect($data)->map('json_decode')->toArray();
 
             $actions = $data['action'] ?? [];
