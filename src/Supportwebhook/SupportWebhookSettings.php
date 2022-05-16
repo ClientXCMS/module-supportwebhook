@@ -13,7 +13,8 @@ class SupportWebhookSettings implements SettingsInterface
     const VARIABLES_NAMES = [
         "%subject%", "%departmentName%",
         "%priority%", "%created_at%",
-        "%action%", "%url%", "%content%", '%relatedUrl%', '%related%'
+        "%action%", "%url%", "%content%", '%relatedUrl%', '%related%',
+        "%username%",  "%userid%", '%email%'
     ];
     const OPTIONS = [
         'support.replay' => 'On Reply',
@@ -30,7 +31,6 @@ class SupportWebhookSettings implements SettingsInterface
         $urls = json_decode($table->findSetting("support_webhook_url", "[]"), true);
         foreach ($actions as $k => $action) {
             if (!empty($urls[$k])) {
-
                 $this->webhooks[$this->i] = [
                     'enabled' => $enabled,
                     'url' => $urls[$k],
@@ -40,7 +40,6 @@ class SupportWebhookSettings implements SettingsInterface
                 ];
                 $this->i++;
             }
-
         }
     }
 
