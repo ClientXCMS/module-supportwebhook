@@ -65,7 +65,7 @@ class WebhookManager
 		    $message = $this->message->find($target->getId());
 		    $ticketId = $message->getTicketId();
                     $route = $this->router->generateURI('support.admin.ticket.edit', ['id' => $ticketId]);
-		    $user = $this->user->find($target->userid);
+		    $user = $this->user->find($target->getAccountId());
                     $context = [
                         '%subject%' => $target->subject,
                         '%url%' => RequestHelper::fromGlobal() . $route,
