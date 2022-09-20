@@ -46,7 +46,7 @@ class DiscordWebhook implements WebhookInterface
             $client->post($uri, [
                 'form_params' =>  [
                     'content' => d($this->content),
-                    'username' => 'ClientXCMS - Discord Webhook'
+                    'username' => 'ClientXCMS - Webhook'
                 ]
             ]);
         } catch (\Exception $e) {
