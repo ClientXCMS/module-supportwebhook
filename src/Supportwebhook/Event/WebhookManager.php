@@ -62,7 +62,7 @@ class WebhookManager
                     continue;
                 }
                 if ($config['message'] != null || $config['url'] != null) {
-		    $ticketId = $target->getId()
+		    $ticketId = $target->getId();
                     $route = $this->router->generateURI('support.admin.ticket.edit', ['id' => $ticketId]);
 		    $user = $this->user->find($target->getAccountId());
                     $context = [
