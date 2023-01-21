@@ -14,13 +14,16 @@ class DiscordWebhook implements WebhookInterface
 
     protected array $config = [];
 
-    public function __construct(string $content = null)
+    public function __construct(?string $content = null)
     {
         $this->content($content);
     }
 
     public function content(?string $content = null): DiscordWebhook
     {
+		if ($content == null){
+			return $this;
+		}
         if (strlen($content) > 2000) {
             throw new InvalidArgumentException('Embed content is limited to 2000 characters');
         }
