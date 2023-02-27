@@ -31,7 +31,7 @@ class WebhookManager
         $this->container = $container;
         $this->webhooks = [new DiscordWebhook()];
         $this->table = $container->get(DepartmentTable::class);
-	$this->message = $container->get(MessageTable::class);
+	    $this->message = $container->get(MessageTable::class);
         $this->router = $container->get(Router::class);
         $this->user = $container->get(UserTable::class);
         $event->attach('support.submit', $this);
@@ -61,6 +61,11 @@ class WebhookManager
                 if ($event->getName() != $config['action']) {
                     continue;
                 }
+                if (method_exists($target, 'getLastState')){
+                    if ($config['action'] == 'support.replay' && $target->getLastState() == 'Reply Support'){
+                        continue;
+                    }
+                }
                 if ($config['message'] != null || $config['url'] != null) {
 		    $ticketId = $target->getId();
                     $route = $this->router->generateURI('support.admin.ticket.edit', ['id' => $ticketId]);
@@ -73,9 +78,9 @@ class WebhookManager
                         '%created_at%' => (new \DateTime())->format(\DateTimeInterface::ATOM),
                         '%action%' => ucfirst(explode('.', $event->getName())[1]),
                         '%content%' => $target->getContent(),
-			'%email%' => $user->email,
-			'%userId%' => $user->id,
-			'%username%' => $user->getName(),
+                        '%email%' => $user->email,
+                        '%userId%' => $user->id,
+                        '%username%' => $user->getName(),
                     ];
                     if ($target->getRelated() != null) {
                         $routeName = $target->getRelated()->getRouteName();
@@ -85,8 +90,8 @@ class WebhookManager
                             '%relatedUrl%' => $this->router->generateURI($routeName, compact('id'))]);
                     } else {
                         $context = array_merge($context, [
-				'%related%' => '',
-                            	'%relatedUrl%' => ''
+				            '%related%' => '',
+                            '%relatedUrl%' => ''
 			]);
                     }
                     $webhook->context(d($config['message']), $context);
