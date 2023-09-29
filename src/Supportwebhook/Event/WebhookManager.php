@@ -68,7 +68,7 @@ class WebhookManager
                 }
                 if ($config['message'] != null || $config['url'] != null) {
 		    $ticketId = $target->getId();
-                    $route = $this->router->generateURI('support.admin.ticket.edit', ['id' => $ticketId]);
+                    $route = $this->router->generateURI('support.admin.tickets.edit', ['id' => $ticketId]);
 		    $user = $this->user->find($target->getAccountId());
                     $context = [
                         '%subject%' => $target->subject,
